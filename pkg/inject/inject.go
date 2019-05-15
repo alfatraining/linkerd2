@@ -391,6 +391,11 @@ func (conf *ResourceConfig) complete(template *v1.PodTemplateSpec) {
 
 // injectPodSpec adds linkerd sidecars to the provided PodSpec.
 func (conf *ResourceConfig) injectPodSpec(patch *Patch) {
+	// check whether pod has auto-mounting of service account token disabled; without it the proxy won't start
+	if conf.pod.spec.AutomountServiceAccountToken != nil && *conf.pod.spec.AutomountServiceAccountToken == false {
+		patch.enableAutomountServiceAccountToken()
+	}
+
 	saVolumeMount := conf.serviceAccountVolumeMount()
 	if !conf.configs.GetGlobal().GetCniEnabled() {
 		conf.injectProxyInit(patch, saVolumeMount)

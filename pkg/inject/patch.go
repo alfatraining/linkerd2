@@ -22,6 +22,8 @@ type Patch struct {
 	patchPathVolume            string
 	patchPathPodLabels         string
 	patchPathPodAnnotations    string
+
+	patchPathEnableAutomountServiceAccountToken string
 }
 
 // NewPatch returns a new instance of Patch for any kind of workload kind
@@ -36,6 +38,8 @@ func NewPatch(kind string) *Patch {
 			patchPathVolume:            "/spec/volumes/-",
 			patchPathPodLabels:         patchPathRootLabels,
 			patchPathPodAnnotations:    "/metadata/annotations",
+
+			patchPathEnableAutomountServiceAccountToken: "/spec/automountServiceAccountToken",
 		}
 	}
 
@@ -48,6 +52,8 @@ func NewPatch(kind string) *Patch {
 		patchPathVolume:            "/spec/template/spec/volumes/-",
 		patchPathPodLabels:         "/spec/template/metadata/labels",
 		patchPathPodAnnotations:    "/spec/template/metadata/annotations",
+
+		patchPathEnableAutomountServiceAccountToken: "/spec/template/spec/automountServiceAccountToken",
 	}
 }
 
@@ -126,6 +132,14 @@ func (p *Patch) addPodAnnotation(key, value string) {
 		Op:    "add",
 		Path:  p.patchPathPodAnnotations + "/" + escapeKey(key),
 		Value: value,
+	})
+}
+
+func (p *Patch) enableAutomountServiceAccountToken() {
+	p.patchOps = append(p.patchOps, &patchOp{
+		Op:    "add",
+		Path:  p.patchPathEnableAutomountServiceAccountToken,
+		Value: true,
 	})
 }
 

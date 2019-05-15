@@ -41,6 +41,7 @@ func TestPatch(t *testing.T) {
 	actual.addVolume(secrets)
 	actual.addPodLabel(k8sPkg.ControllerNSLabel, controllerNamespace)
 	actual.addPodAnnotation(k8sPkg.CreatedByAnnotation, createdBy)
+	actual.enableAutomountServiceAccountToken()
 
 	expected := NewPatch(k8sPkg.Deployment)
 	expected.patchOps = []*patchOp{
@@ -51,6 +52,7 @@ func TestPatch(t *testing.T) {
 		{Op: "add", Path: expected.patchPathVolume, Value: secrets},
 		{Op: "add", Path: expected.patchPathPodLabels + "/" + escapeKey(k8sPkg.ControllerNSLabel), Value: controllerNamespace},
 		{Op: "add", Path: expected.patchPathPodAnnotations + "/" + escapeKey(k8sPkg.CreatedByAnnotation), Value: createdBy},
+		{Op: "add", Path: expected.patchPathEnableAutomountServiceAccountToken, Value: true},
 	}
 
 	if !reflect.DeepEqual(actual, expected) {
