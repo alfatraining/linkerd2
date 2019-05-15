@@ -86,6 +86,14 @@ const (
 	// in service identity.
 	IdentityModeAnnotation = Prefix + "/identity-mode"
 
+	// AutomountServiceAccountTokenAnnotation is set to indicate that the
+	// proxy injector had to enable AutomountServiceAccountToken on the pod
+	AutomountServiceAccountTokenAnnotation = Prefix + "/automount-service-account-token"
+
+	// AutomountServiceAccountTokenEnabled denotes the only value the
+	// AutomountServiceAccountTokenAnnotation can have if it's set.
+	AutomountServiceAccountTokenEnabled = "enabled"
+
 	/*
 	 * Proxy config annotations
 	 */

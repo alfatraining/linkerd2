@@ -611,6 +611,9 @@ func (conf *ResourceConfig) injectObjectMeta(patch *Patch) {
 		patch.addPodAnnotationsRoot()
 	}
 	patch.addPodAnnotation(k8s.ProxyVersionAnnotation, conf.configs.GetGlobal().GetVersion())
+	if conf.pod.spec.AutomountServiceAccountToken != nil && *conf.pod.spec.AutomountServiceAccountToken == false {
+		patch.addPodAnnotation(k8s.AutomountServiceAccountTokenAnnotation, k8s.AutomountServiceAccountTokenEnabled)
+	}
 
 	if conf.configs.GetGlobal().GetIdentityContext() != nil {
 		patch.addPodAnnotation(k8s.IdentityModeAnnotation, k8s.IdentityModeDefault)

@@ -29,6 +29,12 @@ func (conf *ResourceConfig) Uninject(report *Report) ([]byte, error) {
 // and init-container uninjected
 func (conf *ResourceConfig) uninjectPodSpec(report *Report) {
 	t := conf.pod.spec
+
+	if conf.pod.meta.Annotations[k8s.AutomountServiceAccountTokenAnnotation] == k8s.AutomountServiceAccountTokenEnabled {
+		var disableAutomountServiceAccountToken bool
+		t.AutomountServiceAccountToken = &disableAutomountServiceAccountToken
+	}
+
 	initContainers := []v1.Container{}
 	for _, container := range t.InitContainers {
 		if container.Name != k8s.InitContainerName {
