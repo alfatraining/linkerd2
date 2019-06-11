@@ -403,6 +403,7 @@ status:
 				nil,
 				k8sAPI,
 				"linkerd",
+				"cluster.local",
 				[]string{},
 			)
 
@@ -506,6 +507,7 @@ metadata:
 				nil,
 				k8sAPI,
 				"linkerd",
+				"cluster.local",
 				[]string{},
 			)
 
@@ -537,6 +539,7 @@ func TestConfig(t *testing.T) {
 			nil,
 			k8sAPI,
 			"linkerd",
+			"cluster.local",
 			[]string{},
 		)
 		fakeGrpcServer.mountPathGlobalConfig = "testdata/global.conf.json"
