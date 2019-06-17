@@ -33,8 +33,7 @@ const (
 	// defaultKeepaliveMs is used in the proxy configuration for remote connections
 	defaultKeepaliveMs = 10000
 
-	defaultProfileSuffix  = "."
-	internalProfileSuffix = "svc.cluster.local."
+	defaultProfileSuffix = "."
 
 	envLog                = "LINKERD2_PROXY_LOG"
 	envControlListenAddr  = "LINKERD2_PROXY_CONTROL_LISTEN_ADDR"
@@ -922,7 +921,9 @@ func (conf *ResourceConfig) proxyInitResourceRequirements() corev1.ResourceRequi
 
 func (conf *ResourceConfig) proxyDestinationAddr() string {
 	ns := conf.configs.GetGlobal().GetLinkerdNamespace()
-	dns := fmt.Sprintf("linkerd-destination.%s.svc.cluster.local", ns)
+	domain := conf.configs.GetGlobal().GetClusterDomain()
+
+	dns := fmt.Sprintf("linkerd-destination.%s.svc.%s", ns, domain)
 	if conf.destinationDNSOverride != "" {
 		dns = conf.destinationDNSOverride
 	}
@@ -930,7 +931,10 @@ func (conf *ResourceConfig) proxyDestinationAddr() string {
 }
 
 func (conf *ResourceConfig) proxyIdentityAddr() string {
-	dns := fmt.Sprintf("linkerd-identity.%s.svc.cluster.local", conf.configs.GetGlobal().GetLinkerdNamespace())
+	ns := conf.configs.GetGlobal().GetLinkerdNamespace()
+	domain := conf.configs.GetGlobal().GetClusterDomain()
+
+	dns := fmt.Sprintf("linkerd-identity.%s.svc.%s", ns, domain)
 	if conf.identityDNSOverride != "" {
 		dns = conf.identityDNSOverride
 	}
@@ -998,7 +1002,7 @@ func (conf *ResourceConfig) proxyDestinationProfileSuffixes() string {
 	}
 
 	if disableExternalProfiles {
-		return internalProfileSuffix
+		return "svc." + conf.configs.GetGlobal().GetClusterDomain() + "."
 	}
 
 	return defaultProfileSuffix
