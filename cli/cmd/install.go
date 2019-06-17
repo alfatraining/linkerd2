@@ -577,7 +577,7 @@ func (options *installOptions) buildValuesWithoutIdentity(configs *pb.All) (*ins
 
 		// Controller configuration:
 		Namespace:              controlPlaneNamespace,
-		ClusterDomain:          defaultClusterDomain,
+		ClusterDomain:          clusterDomain,
 		UUID:                   configs.GetInstall().GetUuid(),
 		ControllerReplicas:     options.controllerReplicas,
 		ControllerLogLevel:     options.controllerLogLevel,
@@ -770,7 +770,7 @@ func (options *installOptions) globalConfig(identity *pb.IdentityContext) *pb.Gl
 		Version:                options.controlPlaneVersion,
 		IdentityContext:        identity,
 		OmitWebhookSideEffects: options.omitWebhookSideEffects,
-		ClusterDomain:          defaultClusterDomain,
+		ClusterDomain:          clusterDomain,
 	}
 }
 

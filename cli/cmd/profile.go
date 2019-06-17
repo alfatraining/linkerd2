@@ -99,13 +99,13 @@ func newCmdProfile() *cobra.Command {
 			}
 
 			if options.template {
-				return profiles.RenderProfileTemplate(options.namespace, options.name, "cluster.local", os.Stdout)
+				return profiles.RenderProfileTemplate(options.namespace, options.name, clusterDomain, os.Stdout)
 			} else if options.openAPI != "" {
-				return profiles.RenderOpenAPI(options.openAPI, options.namespace, "cluster.local", options.name, os.Stdout)
+				return profiles.RenderOpenAPI(options.openAPI, options.namespace, options.name, clusterDomain, os.Stdout)
 			} else if options.tap != "" {
-				return profiles.RenderTapOutputProfile(checkPublicAPIClientOrExit(), options.tap, options.namespace, options.name, "cluster.local", options.tapDuration, int(options.tapRouteLimit), os.Stdout)
+				return profiles.RenderTapOutputProfile(checkPublicAPIClientOrExit(), options.tap, options.namespace, options.name, clusterDomain, options.tapDuration, int(options.tapRouteLimit), os.Stdout)
 			} else if options.proto != "" {
-				return profiles.RenderProto(options.proto, options.namespace, options.name, "cluster.local", os.Stdout)
+				return profiles.RenderProto(options.proto, options.namespace, options.name, clusterDomain, os.Stdout)
 			}
 
 			// we should never get here
