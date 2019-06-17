@@ -69,7 +69,7 @@ func (h *handler) handleProfileDownload(w http.ResponseWriter, req *http.Request
 	}
 
 	profileYaml := &bytes.Buffer{}
-	err := profiles.RenderProfileTemplate(namespace, service, profileYaml)
+	err := profiles.RenderProfileTemplate(namespace, service, h.clusterDomain, profileYaml)
 
 	if err != nil {
 		log.Error(err)
