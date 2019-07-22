@@ -9,6 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/linkerd/linkerd2/controller/api/public"
 	pb "github.com/linkerd/linkerd2/controller/gen/public"
+	"github.com/linkerd/linkerd2/pkg/config"
 	profiles "github.com/linkerd/linkerd2/pkg/profiles"
 	log "github.com/sirupsen/logrus"
 )
@@ -19,12 +20,12 @@ type (
 	renderTemplate func(http.ResponseWriter, string, string, interface{}) error
 
 	handler struct {
-		render              renderTemplate
-		apiClient           public.APIClient
-		uuid                string
-		controllerNamespace string
-		clusterDomain       string
-		grafanaProxy        *grafanaProxy
+		render                renderTemplate
+		apiClient             public.APIClient
+		uuid                  string
+		controllerNamespace   string
+		grafanaProxy          *grafanaProxy
+		mountPathGlobalConfig string
 	}
 )
 
@@ -68,8 +69,16 @@ func (h *handler) handleProfileDownload(w http.ResponseWriter, req *http.Request
 		return
 	}
 
+	globalConfig, err := config.Global(h.mountPathGlobalConfig)
+	if err != nil {
+		err := fmt.Errorf("error retrieving global config - %s", err)
+		log.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	clusterDomain := globalConfig.GetClusterDomain()
 	profileYaml := &bytes.Buffer{}
-	err := profiles.RenderProfileTemplate(namespace, service, h.clusterDomain, profileYaml)
+	err = profiles.RenderProfileTemplate(namespace, service, clusterDomain, profileYaml)
 
 	if err != nil {
 		log.Error(err)

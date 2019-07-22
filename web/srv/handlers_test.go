@@ -75,10 +75,10 @@ func TestHandleConfigDownload(t *testing.T) {
 	server := FakeServer()
 
 	handler := &handler{
-		render:              server.RenderTemplate,
-		apiClient:           mockAPIClient,
-		controllerNamespace: "linkerd",
-		clusterDomain:       "cluster.local",
+		render:                server.RenderTemplate,
+		apiClient:             mockAPIClient,
+		controllerNamespace:   "linkerd",
+		mountPathGlobalConfig: "testdata/global.conf.json",
 	}
 
 	recorder := httptest.NewRecorder()

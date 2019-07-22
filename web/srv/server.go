@@ -11,6 +11,7 @@ import (
 	"github.com/linkerd/linkerd2/controller/api/public"
 	pb "github.com/linkerd/linkerd2/controller/gen/public"
 	"github.com/linkerd/linkerd2/pkg/filesonly"
+	pkgK8s "github.com/linkerd/linkerd2/pkg/k8s"
 	"github.com/linkerd/linkerd2/pkg/prometheus"
 	log "github.com/sirupsen/logrus"
 )
@@ -56,7 +57,6 @@ func NewServer(
 	staticDir string,
 	uuid string,
 	controllerNamespace string,
-	clusterDomain string,
 	reload bool,
 	apiClient public.APIClient,
 ) *http.Server {
@@ -73,12 +73,12 @@ func NewServer(
 
 	wrappedServer := prometheus.WithTelemetry(server)
 	handler := &handler{
-		apiClient:           apiClient,
-		render:              server.RenderTemplate,
-		uuid:                uuid,
-		controllerNamespace: controllerNamespace,
-		clusterDomain:       clusterDomain,
-		grafanaProxy:        newGrafanaProxy(grafanaAddr),
+		apiClient:             apiClient,
+		render:                server.RenderTemplate,
+		uuid:                  uuid,
+		controllerNamespace:   controllerNamespace,
+		grafanaProxy:          newGrafanaProxy(grafanaAddr),
+		mountPathGlobalConfig: pkgK8s.MountPathGlobalConfig,
 	}
 
 	httpServer := &http.Server{
