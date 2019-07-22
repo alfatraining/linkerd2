@@ -10,6 +10,7 @@ import (
 	sp "github.com/linkerd/linkerd2/controller/gen/apis/serviceprofile/v1alpha1"
 	pb "github.com/linkerd/linkerd2/controller/gen/public"
 	api "github.com/linkerd/linkerd2/controller/k8s"
+	"github.com/linkerd/linkerd2/pkg/config"
 	"github.com/linkerd/linkerd2/pkg/k8s"
 	"github.com/prometheus/common/model"
 	log "github.com/sirupsen/logrus"
@@ -140,6 +141,11 @@ func (s *grpcServer) topRoutesFor(ctx context.Context, req *pb.TopRoutesRequest,
 			return nil, err
 		}
 		// Find service profiles for all services in all objects in the resource.
+		global, err := config.Global(s.mountPathGlobalConfig)
+		if err != nil {
+			return nil, fmt.Errorf("error retrieving global config - %s", err)
+		}
+		clusterDomain := global.GetClusterDomain()
 		for _, obj := range objects {
 			// Lookup services for each object.
 			services, err := s.k8sAPI.GetServicesFor(obj, false)
@@ -148,7 +154,7 @@ func (s *grpcServer) topRoutesFor(ctx context.Context, req *pb.TopRoutesRequest,
 			}
 
 			for _, svc := range services {
-				p := s.k8sAPI.GetServiceProfileFor(svc, clientNs, s.clusterDomain)
+				p := s.k8sAPI.GetServiceProfileFor(svc, clientNs, clusterDomain)
 				profiles[svc.GetName()] = p
 			}
 		}

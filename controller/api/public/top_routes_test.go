@@ -212,6 +212,7 @@ func testTopRoutes(t *testing.T, expectations []topRoutesExpected) {
 			if err != nil {
 				t.Fatalf("Error creating mock grpc server: %s", err)
 			}
+			fakeGrpcServer.mountPathGlobalConfig = "testdata/global.conf.json"
 
 			rsp, err := fakeGrpcServer.TopRoutes(context.TODO(), &exp.req)
 			if err != exp.err {

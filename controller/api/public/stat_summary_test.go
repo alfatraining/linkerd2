@@ -1299,7 +1299,6 @@ status:
 				nil,
 				k8sAPI,
 				"linkerd",
-				"cluster.local",
 				[]string{},
 			)
 
@@ -1326,7 +1325,6 @@ status:
 			nil,
 			k8sAPI,
 			"linkerd",
-			"cluster.local",
 			[]string{},
 		)
 

@@ -2,5 +2,6 @@
     "linkerdNamespace": "linkerd",
     "cniEnabled": false,
     "version": "dev-206ff685-foo",
-    "identityContext": null
+    "identityContext": null,
+    "clusterDomain": "cluster.local"
 }
