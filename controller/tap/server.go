@@ -14,6 +14,7 @@ import (
 	"github.com/linkerd/linkerd2/controller/gen/public"
 	"github.com/linkerd/linkerd2/controller/k8s"
 	"github.com/linkerd/linkerd2/pkg/addr"
+	"github.com/linkerd/linkerd2/pkg/config"
 	pkgK8s "github.com/linkerd/linkerd2/pkg/k8s"
 	"github.com/linkerd/linkerd2/pkg/prometheus"
 	"github.com/linkerd/linkerd2/pkg/util"
@@ -35,6 +36,7 @@ type (
 		tapPort             uint
 		k8sAPI              *k8s.API
 		controllerNamespace string
+		clusterDomain       string
 	}
 )
 
@@ -116,7 +118,7 @@ func (s *server) TapByResource(req *public.TapByResourceRequest, stream pb.Tap_T
 		if res.GetType() == pkgK8s.Namespace {
 			ns = res.GetName()
 		}
-		name := fmt.Sprintf("%s.%s.serviceaccount.identity.%s.cluster.local", pod.Spec.ServiceAccountName, ns, s.controllerNamespace)
+		name := fmt.Sprintf("%s.%s.serviceaccount.identity.%s.%s", pod.Spec.ServiceAccountName, ns, s.controllerNamespace, s.clusterDomain)
 		log.Debugf("initiating tap request to %s with required name %s", pod.Spec.ServiceAccountName, name)
 
 		// pass the header metadata into the request context
@@ -468,7 +470,14 @@ func NewServer(
 		return nil, nil, err
 	}
 
-	s, _ := newGRPCTapServer(tapPort, controllerNamespace, k8sAPI)
+	globalConfig, err := config.Global(pkgK8s.MountPathGlobalConfig)
+	clusterDomain := globalConfig.GetClusterDomain()
+	if err != nil || clusterDomain == "" {
+		clusterDomain = "cluster.local"
+		log.Warnf("failed to load cluster domain from global config: [%s] (falling back to %s)", err, clusterDomain)
+	}
+
+	s, _ := newGRPCTapServer(tapPort, controllerNamespace, clusterDomain, k8sAPI)
 
 	return s, lis, nil
 }
@@ -476,12 +485,14 @@ func NewServer(
 func newGRPCTapServer(
 	tapPort uint,
 	controllerNamespace string,
+	clusterDomain string,
 	k8sAPI *k8s.API,
 ) (*grpc.Server, *server) {
 	srv := &server{
 		tapPort:             tapPort,
 		k8sAPI:              k8sAPI,
 		controllerNamespace: controllerNamespace,
+		clusterDomain:       clusterDomain,
 	}
 
 	s := prometheus.NewGrpcServer()
